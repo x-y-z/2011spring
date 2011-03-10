@@ -1,6 +1,12 @@
 #include <openssl/ssl.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
+
+int matching(unsigned char *prefix, unsigned char *input, int length);
+int randomMsg(unsigned char *msg);
+int digMsg(unsigned char *msg, unsigned char *dig);
 
 int main()
 {
@@ -10,6 +16,7 @@ int main()
     unsigned int matchLen;
     unsigned int input;
     int i;
+    int digCounter = 0;
 
 
     fprintf(stdout, "Enter Number of Bytes to match\n");
@@ -33,5 +40,63 @@ int main()
     
     printf("\n");
 
+    srand(time(NULL));
+
+    do
+    {
+        randomMsg(targetMsg);
+        digMsg(targetMsg, targetDig);
+        digCounter++;
+    }while (matching(matchDigPrefix, targetDig, matchLen) != 0);
+
     return 0;
+}
+
+/*
+ * compare prefix and input, according to given length, 
+ * give the result
+ *
+ * @param prefix digest prefix
+ * @param input produced message digest
+ * @param length how many bytes to be compare
+ *
+ * @ret the result, 0: matched, otherwise: not matched
+ *
+ */
+int matching(unsigned char *prefix, unsigned char *input, int length)
+{
+    int i;
+    
+    for (i = 0; (prefix[i] - input[i] == 0) && (i < length); i++);
+
+    return prefix[i] - input[i];
+}
+
+
+/*
+ * randomly give out a 20 bytes message
+ *
+ * @param[out] msg randomly produced message
+ *
+ */
+int randomMsg(unsigned char *msg)
+{
+   int i;
+
+   for (i = 0; i < 20; i++)
+       msg[i] = rand() % 256;
+
+   return 0;
+}
+
+/*
+ * get MD5 digest from given message
+ *
+ * @param[in] msg given message
+ * @param[out] MD5 digest
+ *
+ */
+int digMsg(unsigned char *msg, unsigned char *dig)
+{
+    
 }
