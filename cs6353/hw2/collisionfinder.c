@@ -49,6 +49,23 @@ int main()
         digCounter++;
     }while (matching(matchDigPrefix, targetDig, matchLen) != 0);
 
+
+    fprintf(stdout, "\n\nMatch in %d runs\n", digCounter);
+    
+    fprintf(stdout, "Message in hexadecimal format\n");
+    for (i = 0; i < 20; i++)
+    {
+        fprintf(stdout, "%02x", targetMsg[i]);
+    }
+    printf("\n");
+
+    fprintf(stdout, "MD5 Digest in hexadecimal format\n");
+    for (i = 0; i < 16; i++)
+    {
+        fprintf(stdout, "%02x", targetDig[i]);
+    }
+    printf("\n");
+
     return 0;
 }
 
