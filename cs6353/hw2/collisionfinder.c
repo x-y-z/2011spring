@@ -98,5 +98,16 @@ int randomMsg(unsigned char *msg)
  */
 int digMsg(unsigned char *msg, unsigned char *dig)
 {
-    
+    EVP_MD_CTX mdctx;
+    int md_len;
+
+    OpenSSL_add_all_digests();
+
+    EVP_MD_CTX_init(&mdctx);
+    EVP_DigestInit_ex(&mdctx, EVP_md5(), NULL);
+    EVP_DigestUpdate(&mdctx, msg, 20);
+    EVP_DigestFinal_ex(&mdctx, dig, &md_len);
+    EVP_MD_CTX_cleanup(&mdctx);
+
+    return 0;
 }
