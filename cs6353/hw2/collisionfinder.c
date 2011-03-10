@@ -84,9 +84,14 @@ int matching(unsigned char *prefix, unsigned char *input, int length)
 {
     int i;
     
-    for (i = 0; (prefix[i] - input[i] == 0) && (i < length); i++);
+    for (i = 0; i < length; i++)
+    {
+        if (prefix[i] - input[i] != 0)
+            return prefix[i] - input[i];
+    }
 
-    return prefix[i] - input[i];
+    return 0;
+
 }
 
 
