@@ -74,14 +74,23 @@ int udp::send(const char *msg, int len)
 
 int udp::recv(char *msg, int len)
 {
-    struct sockaddr_in cad;
-    int clen;
+    //struct sockaddr_in cad;
+    //int clen;
 
     if (inited == 0)
         return -1;
 
     return recvfrom(serverSocket, msg, len, 0,
                    (struct sockaddr *)&cad, (socklen_t *)&clen);
+}
+
+int udp::senderInfo(char *host, int &port)
+{
+    //inet_ntop(cad.sin_family, &cad.sin_addr, host, INET_ADDRSTRLEN);
+
+    port = ntohs(cad.sin_port);
+
+    return 0;
 }
 
 int udp::close()

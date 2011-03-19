@@ -1,6 +1,7 @@
 #ifndef __UDP_H__
 #define __UDP_H__
 
+#include <arpa/inet.h>
 #include <sys/socket.h>
 #include <netdb.h>
 #include <sys/types.h>
@@ -10,6 +11,8 @@ class udp
 {
 private:
     int serverSocket;//for  server mode
+    sockaddr_in cad;//temporary client info
+    int clen;//temporary client info
 
     int clientSocket;//for client mode
     sockaddr_in sad;//for both server and client mode
@@ -21,7 +24,7 @@ private:
 
     int inited;
 public:
-    udp(int aMode)
+    udp(int aMode)//-1: client, 1:server
     {
         mode = aMode;
         inited = 0;
@@ -41,6 +44,8 @@ public:
     int init(const char *host, int port);//client 
     int send(const char *msg, int len);//for client
     int recv(char *msg, int len);//for server
+    int senderInfo(char *host, int &port);//should be invoked immediately
+                                                //after recv()
     int close();
 
 };
