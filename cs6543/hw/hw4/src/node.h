@@ -21,6 +21,10 @@ typedef struct route_entry{
     int dist;
 } route_entry;
 
+void *sendNeighbor(void *param);
+void *recvLoop(void *param);
+
+
 class node
 {
 private:
@@ -32,11 +36,14 @@ private:
 public:
     int addNeighbor(int nodeNum, int dist);
     int giveNeighbors(neighbor *&nTable, int &len);
-    int addAdjEntry(adj_entry aEntry);
+    int addAdjEntry(int nodeNum, neighbor *adjList, int listLen);
+    int printTopo();
     int computeRouteTable(route_entry *&routeTable);
 
     int setPort(int aPort){ myPort = aPort; };
     int getPort(){ return myPort; };
+
+    int giveForwardList(int msgSrc, int *&portList, int &len);
 };
 
 #endif

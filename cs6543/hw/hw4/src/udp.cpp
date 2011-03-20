@@ -1,6 +1,7 @@
 #include "udp.h"
 #include <cstring>
 #include <iostream>
+#include <errno.h>
 
 int udp::serverM = 1;
 int udp::clientM = -1;
@@ -25,7 +26,7 @@ int udp::init(int port)
 
     if (bind(serverSocket, (struct sockaddr *)&sad, sizeof(sad)) < 0)
     {
-        std::cerr<<"bind failed\n";
+        std::cerr<<"bind failed: "<<errno<<"\n";
         ::exit(1);
     }
 
