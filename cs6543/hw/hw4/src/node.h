@@ -21,8 +21,15 @@ typedef struct route_entry{
     int dist;
 } route_entry;
 
+typedef struct lsa_msg{
+    int src;
+    int nLen;
+    int node;
+} lsa_msg;
+
 void *sendNeighbor(void *param);
 void *recvLoop(void *param);
+unsigned int JSHash(char* str, unsigned int len);
 
 
 class node
@@ -38,12 +45,13 @@ public:
     int giveNeighbors(neighbor *&nTable, int &len);
     int addAdjEntry(int nodeNum, neighbor *adjList, int listLen);
     int printTopo();
-    int computeRouteTable(route_entry *&routeTable);
+    int computeRouteTable();
 
     int setPort(int aPort){ myPort = aPort; };
     int getPort(){ return myPort; };
 
     int giveForwardList(int msgSrc, int *&portList, int &len);
+
 };
 
 #endif

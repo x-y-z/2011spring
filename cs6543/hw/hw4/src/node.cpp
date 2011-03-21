@@ -1,5 +1,6 @@
 #include "node.h"
 #include "udp.h"
+#include "dijkstra/dijkstra.h"
 #include <iostream>
 #include <vector>
 #include <cstdlib>
@@ -59,26 +60,74 @@ int node::giveForwardList(int msgSrc, int *&portList, int &len)
 int node::addAdjEntry(int nodeNum, neighbor *adjList, int listLen)
 {
     adj_entry newEntry;
-    neighbor oneNeignbor;
+    //neighbor oneNeignbor;
 
     newEntry.nodeNum = nodeNum;
     
     for (int i = 0; i < listLen; i ++)
     {
-        oneNeignbor =adjList[i];
+        //oneNeignbor =adjList[i];
+        newEntry.neighborList.push_back(adjList[i]);
     }
+
+    myTopo.push_back(newEntry);
 
     return 0;
 }
 
-int node::computeRouteTable(route_entry *&routeTable)
+int node::computeRouteTable()
 {
+    vector<adj_entry>::iterator iter1;
+    vector<neighbor>::iterator iter2;
+    dijkstra aPath;
+
+
+    for (iter1 = myTopo.begin(); iter1 != myTopo.end(); iter1++)
+    {
+        char name[50];
+
+        sprintf(name, "Node:%d", (*iter1).nodeNum);
+        aPath.addVertex((*iter1).nodeNum, name);
+        for (iter2 = (*iter1).neighborList.begin(); 
+             iter2 != (*iter1).neighborList.end();
+             iter2++)
+        {
+            aPath.addEdge((*iter1).nodeNum, 
+                          (*iter2).nodeNum, (*iter2).dist);
+            aPath.addEdge((*iter2).nodeNum, 
+                          (*iter1).nodeNum, (*iter2).dist);
+        }
+
+    }
+
+    aPath.computePaths(getPort());
+    aPath.printShortestPath();
+
 
 }
 
 
 int node::printTopo()
 {
+    vector<adj_entry>::iterator iter1;
+    vector<neighbor>::iterator iter2;
+
+    std::cout<<"\nNew topology is found:\n";
+
+    for (iter1 = myTopo.begin(); iter1 != myTopo.end(); iter1++)
+    {
+        std::cout<<"Node ("<<(*iter1).nodeNum<<") has:";
+        for (iter2 = (*iter1).neighborList.begin(); 
+             iter2 != (*iter1).neighborList.end();
+             iter2++)
+        {
+            std::cout<<(*iter2).nodeNum<<", ";
+        }
+
+        std::cout<<"\b \n";
+    }
+
+    return 0;
 }
 
 int main(int argc, char**argv)
@@ -104,24 +153,52 @@ int main(int argc, char**argv)
             router.addNeighbor(nodeNum, dist);
     }while (nodeNum != -1);
 
+    //insert neighbor info hash value into lsaDB
+    neighbor *tmp;
+    int tLen;
+    char *ownHash;
+    int oLen;
+    unsigned int hashValue;
+
+    router.giveNeighbors(tmp, tLen);
+    oLen = 2 * sizeof(int) + tLen * sizeof(neighbor);
+    ownHash = new char[oLen];
+    (*(int *)ownHash) = tLen;
+    *(((int *)ownHash) + 1) = router.getPort();
+    memcpy(ownHash + 2 * sizeof(int), tmp, tLen * sizeof(neighbor));
+    hashValue = JSHash(ownHash, oLen);
+    lsaDB.push_back(hashValue);
+
+    //add my own topo
+    router.addAdjEntry(router.getPort(),
+                       tmp,
+                       tLen);
+    delete []tmp;
+    delete []ownHash;
+
+
+
     std::cout<<"Flooding!\n";
 
     
     pthread_t thread_id;
     //receiving & forwarding & print network & routing table
     //need a thread
-    //pthread_create(&thread_id, NULL, recvLoop, &router);
+    pthread_create(&thread_id, NULL, recvLoop, &router);
 #ifdef RECV
     recvLoop(&router);
 #endif
 
 #ifdef SEND
     //sending
+    std::cout<<"Enter any key to start flooding\n";
+    getchar();
+    getchar();
     sendNeighbor(&router);
 #endif
     //with pthread_join to wait, otherwise router data will destroyed
 
-    //pthread_join(thread_id, NULL);
+    pthread_join(thread_id, NULL);
 }
 
 void *sendNeighbor(void *param)
@@ -130,15 +207,19 @@ void *sendNeighbor(void *param)
     neighbor *sendTable = NULL;
     int tLen;
     char *msg;
+    lsa_msg *aMsg;
     int mLen;
     
     aRouter->giveNeighbors(sendTable, tLen);
 
-    mLen = 2 * sizeof(int) + tLen * sizeof(neighbor);
+    mLen = 3 * sizeof(int) + tLen * sizeof(neighbor);
     msg = new char[mLen];
-    (*(int *)msg) = aRouter->getPort();
-    *(((int *)msg) + 1) = tLen;
-    memcpy(msg + 2 * sizeof(int), sendTable, tLen * sizeof(neighbor));
+    aMsg = (lsa_msg *)msg;
+    aMsg->src = aRouter->getPort();
+    aMsg->nLen = tLen;
+    aMsg->node = aRouter->getPort();
+    memcpy(msg + 3 * sizeof(int), sendTable, tLen * sizeof(neighbor));
+    
 
     for (int i = 0; i < tLen; i++)
     {
@@ -148,7 +229,8 @@ void *sendNeighbor(void *param)
         aUdp.close();
     }
 
-    delete sendTable[];
+    delete []sendTable;
+    delete []msg;
 
     return NULL;
 }
@@ -161,6 +243,7 @@ void *recvLoop(void *param)
     udp listener(1);//server mode
     char buf[500];
     int bLen;//received msg length
+    lsa_msg *rMsg;//remote message
     int remotePort;
     bool ifForward = true;
     
@@ -168,11 +251,13 @@ void *recvLoop(void *param)
 
     while (1)
     {
+        ifForward = true;
         bLen = listener.recv(buf, 500);
-        //listener.senderInfo(NULL, remotePort);
-        remotePort = (*(int *)buf);
-        nLen = *(((int *)buf) + 1);
-        if (nLen * sizeof(neighbor) + 2 * sizeof(int) != bLen)
+        rMsg = (lsa_msg *)buf;
+
+        remotePort = rMsg->src;
+        nLen = rMsg->nLen;
+        if (nLen * sizeof(neighbor) + 3 * sizeof(int) != bLen)
         {
             std::cerr<<"Packet corrupted.\n";
             exit(1);
@@ -193,10 +278,12 @@ void *recvLoop(void *param)
 
         if (ifForward == true)//not got this before
         {
+            //add hashValue into lsaDB
+            lsaDB.push_back(hashValue);
             //get neighbor list
             aRouter->giveForwardList(remotePort, neighborList, nLen);
             //send data to all neighbors except the soruce of the data
-            (*(int *)buf) = aRouter->getPort();
+            rMsg->src = aRouter->getPort();
             for (int i = 0; i < nLen; i++)
             {
                 udp aForward(-1);
@@ -204,15 +291,16 @@ void *recvLoop(void *param)
                 aForward.send(buf, bLen);
             }
 
-            delete neighborList[];
+            delete []neighborList;
 
             //add info to myTopo
-            aRouter->addAdjEntry(remotePort, 
-                                 (neighbor *)(buf + 2 * sizeof(int)),
-                                 nLen);
+            aRouter->addAdjEntry(rMsg->node, 
+                                 (neighbor *)(buf + 3 * sizeof(int)),
+                                 rMsg->nLen);
             aRouter->printTopo();
             //print new route table
-            //aRouter->computeRouteTable(NULL);
+            aRouter->computeRouteTable();
+
         }
 
         
