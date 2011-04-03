@@ -1,3 +1,8 @@
+/*
+ * Author: Zi Yan
+ * Date: 03/20/2011
+ *
+ */
 #include "node.h"
 #include "udp.h"
 #include "dijkstra/dijkstra.h"
@@ -101,8 +106,8 @@ int node::computeRouteTable()
     }
 
     aPath.computePaths(getPort());
-    aPath.printShortestPath();
-
+//    aPath.printShortestPath();
+    aPath.printRouteTable();
 
 }
 

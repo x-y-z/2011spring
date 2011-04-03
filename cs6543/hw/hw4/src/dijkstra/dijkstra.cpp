@@ -83,6 +83,23 @@ void dijkstra::printShortestPath()
     }
 }
 
+void dijkstra::printRouteTable()
+{
+	for (adjacency_map_t::iterator vertex_iter = adjacency_map.begin();
+         vertex_iter != adjacency_map.end();
+         vertex_iter++)
+    {
+        vertex_t v = vertex_iter->first;
+        std::list<vertex_t> path =
+            getShortestPathTo(v);
+        std::list<vertex_t>::iterator path_iter = path.begin();
+        if (path.size() > 1)
+            path_iter++;
+        std::cout << "Distance to " << vertex_names[v] << ": " <<
+                     min_distance[v] << ", next hop is: "<< 
+                     vertex_names[*path_iter] <<std::endl;
+    }
+}
 
 void dijkstra::addVertex(vertex_t aVertice, std::string aName)
 {

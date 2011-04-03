@@ -46,7 +46,7 @@ public:
     int recv(char *msg, int len);//for server
     int senderInfo(char *host, int &port);//should be invoked immediately
                                                 //after recv()
-    int close();
+    int close();//close the socket
 
 };
 

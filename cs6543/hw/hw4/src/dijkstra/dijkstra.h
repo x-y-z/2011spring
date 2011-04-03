@@ -51,6 +51,7 @@ public:
 	void computePaths(vertex_t source);
 	std::list<vertex_t> getShortestPathTo(vertex_t target);
 	void printShortestPath();
+    void printRouteTable();
 };
 
 

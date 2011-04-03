@@ -1,3 +1,8 @@
+/*
+ * Author: Zi Yan
+ * Date: 03/20/2011
+ *
+ */
 #include "udp.h"
 #include <cstring>
 #include <iostream>

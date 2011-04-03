@@ -5,6 +5,8 @@
 
 using std::vector;
 
+//neighbor information
+//
 typedef struct neighbor{
     int nodeNum;
     int dist;
