@@ -28,7 +28,9 @@ Solution:
  channels will be insecure due to the key loss.
  \item[(b)] First, they broadcast all the identifiers of the keys they have.
  Second, they pick a key shared by both in their key ring according to
- the identifiers.
+ the identifiers. An alternate method will let a node broadcast some 
+ challenges encrypted by its keys, and the receiver can decrypt one by
+ using a key shared by both, finally a shared key is found.
  \item[(c)] They will find a path between them, which consisted of nodes
  that can use shared keys to communicate, and then pick a path-key from
  unused keys in the key ring.
@@ -57,9 +59,13 @@ Solution:
  \item[(a)] 1) To save storage space by reducing node information (compared
  to node append), 2) to resist multiple attack paths (compared to node sampling).
  \item[(b)] To save storage space, because only one segment, offset information
- and distance will be stored.
+ and distance will be stored. Because appending these information after a
+  packet will be costly.
  \item[(c)] 1) For node sampling, it cannot reconstruct the path. 2) For edge
- sampling, it does not matter.
+ sampling, if the routers far away from the victim have small probabilities to 
+ mark a packet, the convergence of a path will be slow. When the far away
+  routers have large probabilities to mark a packet, the convergence will be
+  quick.
 \end{itemize}
 
 \section{Q5}
