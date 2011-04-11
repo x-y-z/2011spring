@@ -1,0 +1,76 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage{url}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+
+\author{Zi Yan}
+\title{RFID Anti-Collision Protocols Summary}
+\date{}
+\begin{document}
+\maketitle
+
+\section{Introduction}
+Radio Frequency Identification (RFID) systems are widely used in
+our daily life, like payment by mobile phones, transportation
+payments, and toll road payments\cite{wiki}. The systems can
+identify objects remotely and wirelessly, so that they facilitate 
+the situations that need identification of stuffs at the same time.
+Therefore, more focuses are put on RFID, in order to make 
+improvement on its performance.
+
+In general, a RFID system has a reader and many tags. The reader
+is typically a device reads information from those tags and is 
+supplied with power, memory, and computational ability. And
+the tags have various computational capabilities. When the 
+passive tags can only give out information if the reader energizes
+it, the active tags can send signals by themselves. The communication
+distance also varies in accordance with whether the tag is passive or
+not.
+
+The most significant problem in RFID area is collision while a
+reader is acquiring information from multiple tags. A sequential
+order has to be enforced by all tags, thereby avoiding that two or
+more tags may send their information at the same time. A collision
+will make signals from two or more tags useless, leading to wastage
+of bandwidth, energy, and increase of identification delays\cite{survey}. 
+
+In \cite{survey}, three groups of anti-collision protocols are
+discussed, which are Aloha-based protocols, tree-based protocols,
+and hybrid protocols. There are still several variations in each
+group. By using these protocols, a reader can identify a certain
+amount of tags in a quick and less collisional way.
+
+\section{Background} 
+The RFID systems can be categorized in different ways, from 
+communication method, operating frequency, to tag type.
+
+\subsection{Communication Method}
+Magnetic and electromagnetic coupling are the two ways of
+identifying a tag. The former one differs from the latter one
+in that an electromagnetic read can send signals further
+than  a magnetic one. In other words, it is the difference
+between near field and far field.
+
+\subsection{Operating Frequency}
+RFID systems use frequency band that ranges from 100KHz
+to 5.8GHz\cite{survey}. 
+
+\subsection{Tag Type}
+There are passive tags, active tags, and ones between previous
+two, called semi-passive tags. The difference among these tags
+is how they are energized. Passive tags are energized by readers, 
+whereas semi-passive and active tags have their own power source.
+In addition, Passive, semi-passive, and active tags own computational
+capabilities in a ascending order.
+
+\section{Brief Introduction to Protocols}
+
+\section{Framed Aloha Protocols}
+
+\section{Discussion}
+
+\section{Conclusion}
+
+\bibliographystyle{plain}
+\bibliography{ref} 
+\end{document}
