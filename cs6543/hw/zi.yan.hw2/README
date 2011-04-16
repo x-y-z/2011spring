@@ -1,0 +1,5 @@
+*How to compile: Use Makefile to compiler both hotel and bank program
+
+*How to execute: Execute hotel program with hotel port number, bank address, and bank port number, and execute bank program with bank port number.
+
+*Note: Remember to modify the hotel address and port number in the file index.html.
